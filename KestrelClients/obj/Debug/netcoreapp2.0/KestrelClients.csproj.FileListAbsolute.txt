@@ -1,0 +1,11 @@
+c:\users\justin\source\repos\KestrelClients\KestrelClients\bin\Debug\netcoreapp2.0\KestrelClients.deps.json
+c:\users\justin\source\repos\KestrelClients\KestrelClients\bin\Debug\netcoreapp2.0\KestrelClients.runtimeconfig.json
+c:\users\justin\source\repos\KestrelClients\KestrelClients\bin\Debug\netcoreapp2.0\KestrelClients.runtimeconfig.dev.json
+c:\users\justin\source\repos\KestrelClients\KestrelClients\bin\Debug\netcoreapp2.0\KestrelClients.dll
+c:\users\justin\source\repos\KestrelClients\KestrelClients\bin\Debug\netcoreapp2.0\KestrelClients.pdb
+c:\users\justin\source\repos\KestrelClients\KestrelClients\obj\Debug\netcoreapp2.0\KestrelClients.csproj.CoreCompileInputs.cache
+c:\users\justin\source\repos\KestrelClients\KestrelClients\obj\Debug\netcoreapp2.0\KestrelClients.AssemblyInfoInputs.cache
+c:\users\justin\source\repos\KestrelClients\KestrelClients\obj\Debug\netcoreapp2.0\KestrelClients.AssemblyInfo.cs
+c:\users\justin\source\repos\KestrelClients\KestrelClients\obj\Debug\netcoreapp2.0\KestrelClients.dll
+c:\users\justin\source\repos\KestrelClients\KestrelClients\obj\Debug\netcoreapp2.0\KestrelClients.pdb
+c:\users\justin\source\repos\KestrelClients\KestrelClients\obj\Debug\netcoreapp2.0\KestrelClients.csprojResolveAssemblyReference.cache
