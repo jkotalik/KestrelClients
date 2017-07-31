@@ -16,10 +16,7 @@ namespace KestrelClients
         public int port = 61397;
         public static void Main(string[] args)
         {
-
-
-            TestMinRequestBodyDataRate();
-
+            TestMinResponseDataRate();
             Console.ReadLine();
         }
 
@@ -29,21 +26,17 @@ namespace KestrelClients
         {
             var limit = 10;
 
-            var limits = new int[] { limit };//, Limit - 1, Limit + 1, Limit * 2, Limit * 10 };
 
             try
             {
-                foreach (var l in limits)
-                {
-                    for (var i = 0; i < l; i++)
-                    {
-                        var client = new HttpClient();
 
-                        for (int j = 0; j < 5; j++)
-                        {
-                            var content = new StringContent("asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf");
-                            var res = await client.PostAsync(url, content);
-                        }
+                for (var i = 0; i < limit; i++)
+                {
+                    var client = new HttpClient();
+                    for (int j = 0; j < 5; j++)
+                    {
+                        var content = new StringContent("asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf");
+                        var res = await client.PostAsync(url, content);
                     }
                 }
             }
@@ -58,7 +51,9 @@ namespace KestrelClients
             try
             {
                 var client = new HttpClient();
-                var fileStream = File.Open("enron.json", FileMode.Open);
+                client.DefaultRequestHeaders.Add("Transfer-Encoding", "chunked");
+
+                var fileStream = File.Open("companies.json", FileMode.Open);
                 var content = new StreamContent(fileStream);
                 var res = await client.PostAsync(url, content);
                 // Success!
@@ -113,7 +108,7 @@ namespace KestrelClients
                 socket.ReceiveBufferSize = 1;
                 socket.Connect(ipe);
 
-                var bytesToSend = Encoding.ASCII.GetBytes("GET / HTTP/1.1\r\nHost: " + "localhost" + "\r\nConnection: Close\r\n\r\n");
+                var bytesToSend = Encoding.ASCII.GetBytes("GET / HTTP/1.1\r\nHost: " + "localhost" + "\r\n\r\n");
                 socket.Send(bytesToSend, bytesToSend.Length, 0);
 
                 int bytes = 0;
@@ -122,7 +117,7 @@ namespace KestrelClients
                 while ((bytes = socket.Receive(bytesReceived, 1, 0)) > 0)
                 {
                     Console.WriteLine($"Read a piece of data {(char)bytesReceived[0]}");
-                    Task.Delay(TimeSpan.FromMilliseconds(100));
+                    Thread.Sleep(100);
                 }
                 Console.WriteLine("Done reading stream");
 
@@ -137,7 +132,6 @@ namespace KestrelClients
         {
             while (true)
             {
-
                 try
                 {
                     var ipAddress = IPAddress.Parse("127.0.0.1");
@@ -145,30 +139,33 @@ namespace KestrelClients
                     var socket = new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                     // Making buffer size 1 to trigger slow requests
-                    socket.SendBufferSize = 10;
                     socket.Connect(ipe);
-                    socket.SendTimeout = 10000;
                     socket.NoDelay = true;
+                    socket.SendTimeout = 1000;
 
-                    // Maybe make this a bit longer
-                    var testString = "the quick brown fox jumps over the lazy dog. the quick brown fox jumps over the lazy dog. the quick brown fox jumps over the lazy dog. the quick brown fox jumps over the lazy dog.";
-                    var headerString = $"POST / HTTP/1.1\r\nHost: localhost\r\nConnection: Close\r\nContent-Length: {testString.Length}\r\n\r\n";
-                    Console.WriteLine(headerString + testString);
-                    var header = Encoding.ASCII.GetBytes(headerString);
+                    var testString = "hello world";
+                    var request = $"POST / HTTP/1.0\r\n" +
+                        $"Content-Length: {testString.Length}" +
+                        "\r\n\r\n" +
+                        testString;
 
+                    Console.WriteLine(DateTimeOffset.UtcNow);
                     int bytes = 0;
-
-                    socket.Send(header);
-                    Console.WriteLine("Sent header");
-
-                    var bytesToSend = Encoding.ASCII.GetBytes(testString);
-                    while ((bytes += socket.Send(bytesToSend, bytes, 1, 0)) < bytesToSend.Length)
+                    var bytesToSend = Encoding.ASCII.GetBytes(request);
+                    while ((bytes += socket.Send(bytesToSend, bytes, 1, SocketFlags.None)) < bytesToSend.Length)
                     {
-                        Console.WriteLine($"Sent a byte of data to server {bytes}");
-                        Thread.Sleep(1);
+                        Console.WriteLine($"Sent a byte of data to server {(char)bytesToSend[bytes - 1]}");
+                        Thread.Sleep(100);
                     }
 
                     Console.WriteLine("Successfully sent data to server");
+
+                    var buffer = new byte[1];
+                    while (socket.Receive(buffer) != 0)
+                    {
+                        Console.Write((char)buffer[0]);
+                        Console.Out.Flush();
+                    }
                 }
                 catch (Exception ex)
                 {
